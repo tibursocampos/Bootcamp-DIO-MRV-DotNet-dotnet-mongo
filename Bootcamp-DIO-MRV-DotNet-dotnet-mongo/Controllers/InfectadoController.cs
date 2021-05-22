@@ -2,6 +2,7 @@
 using Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using System;
 
 namespace Api.Controllers
 {
@@ -26,6 +27,24 @@ namespace Api.Controllers
             _infectadosCollection.InsertOne(infectado);
 
             return StatusCode(201, "Infectado adicionado com sucesso");
+        }
+
+        [HttpPut]
+        public ActionResult AtualizarInfectado([FromBody] InfectadoDto dto)
+        {
+            var infectado = new Infectado(dto.DataNascimento, dto.Sexo, dto.Latitude, dto.Longitude);
+
+            _infectadosCollection.UpdateOne(Builders<Infectado>.Filter.Where(x => x.DataNascimento == dto.DataNascimento), Builders<Infectado>.Update.Set("sexo", dto.Sexo));
+
+            return Ok("Infectado atualizado com sucesso");
+        }
+
+        [HttpDelete("{dataNasc}")]
+        public ActionResult ApagarInfectado(DateTime dataNasc)
+        {
+            _infectadosCollection.DeleteOne(Builders<Infectado>.Filter.Where(x => x.DataNascimento == dataNasc));
+
+            return Ok("Infectado apagado com sucesso");
         }
 
         [HttpGet]
